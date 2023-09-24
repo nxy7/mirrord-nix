@@ -16,7 +16,7 @@
           packages.default = import ./. {
             lib = pkgs.lib;
             fetchFromGitHub = pkgs.fetchFromGitHub;
-            rustPlatform = pkgs.rustPlatform;
+            makeRustPlatform = pkgs.makeRustPlatform;
           };
         };
     };
