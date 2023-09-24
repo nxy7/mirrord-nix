@@ -1,7 +1,7 @@
 {
   description = "Project starter";
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.05";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     nix2container.url = "github:nlewo/nix2container";
   };
@@ -14,6 +14,7 @@
         in {
           devShells.default = pkgs.mkShell { packages = with pkgs; [ hello ]; };
           packages.default = import ./. {
+            inherit pkgs;
             lib = pkgs.lib;
             fetchFromGitHub = pkgs.fetchFromGitHub;
             makeRustPlatform = pkgs.makeRustPlatform;

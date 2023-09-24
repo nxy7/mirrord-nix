@@ -1,4 +1,4 @@
-{ lib, fetchFromGitHub, makeRustPlatform, ... }:
+{ pkgs, lib, fetchFromGitHub, makeRustPlatform, ... }:
 with import <nixpkgs> {
   overlays = [
     (import (fetchTarball
@@ -35,7 +35,7 @@ in rustPlatform.buildRustPackage rec {
     "rasn-0.6.1" = "sha256-Pn0v+UR+gMKHMkhGTeL8bYBXoNQNnYrJ8Tluc2HVEZo=";
     "tracing-0.1.37" = "sha256-VVIVJz1+u4PqRFj1lAKGB6EbnP+b4dnimOWaNEkBAos=";
   };
-  nativeBuildInputs = with pkgs; [ protobuf ];
+  nativeBuildInputs = with pkgs; [ protobuf frida-tools pkg-config ];
 
   meta = with lib; {
     description =
