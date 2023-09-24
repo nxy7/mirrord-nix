@@ -1,7 +1,7 @@
 {
   description = "Project starter";
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-23.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
     nix2container.url = "github:nlewo/nix2container";
   };
@@ -13,7 +13,11 @@
         let pkgs = import nixpkgs { inherit system; };
         in {
           devShells.default = pkgs.mkShell { packages = with pkgs; [ hello ]; };
-          apps.default = import ./.;
+          packages.default = import ./. {
+            lib = pkgs.lib;
+            fetchFromGitHub = pkgs.fetchFromGitHub;
+            rustPlatform = pkgs.rustPlatform;
+          };
         };
     };
 }

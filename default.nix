@@ -1,4 +1,4 @@
-{ lib, fetchFromGitHub, rustPlatform }:
+{ lib, fetchFromGitHub, rustPlatform, ... }:
 
 rustPlatform.buildRustPackage rec {
   pname = "mirrord";
@@ -8,17 +8,21 @@ rustPlatform.buildRustPackage rec {
     owner = "metalbear-co";
     repo = "mirrord";
     rev = "${version}";
-    hash = lib.fakeHash;
+    hash = "sha256-63qJhje5YjeX55OIwMFk+qkbNgaZ6Nr1tL+GCbByzoY=";
   };
 
-  vendorHash = lib.fakeHash;
+  cargoHash = lib.fakeHash;
+  cargoDeps = rustPlatform.importCargoLock {
+    inherit src;
+    lockFile = ./Cargo.lock;
+  };
 
   meta = with lib; {
     description =
       "Run your local code in the real-time context of your cloud environment, with access to other microservices, databases, queues, and managed services, all without leaving the local setup you know and love.";
     homepage = "https://mirrord.dev/";
     license = licenses.asl20;
-    maintainers = with maintainers; [ nxyt ];
+    maintainers = with maintainers; [ ];
     mainProgram = "mirrord";
   };
 }
