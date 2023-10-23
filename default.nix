@@ -43,14 +43,13 @@ let
 
   doCheck = false;
 
-  frida-gum_hack = pkgs.stdenv.mkDerivation {
+  frida-gum = pkgs.stdenv.mkDerivation {
     name = "copy-frida";
     src = ./fridaDeps;
-    phases = [ "installPhase" ];
+    phases = [ "unpackPhase" "installPhase" ];
     installPhase = ''
       mkdir -p $out/lib
-      cp $src/frida-gum.h $out/lib
-      cp $src/libfrida-gum.a $out/lib
+      cp $src/** $out/lib/
     '';
   };
 in rustPlatform.buildRustPackage rec {
@@ -58,19 +57,13 @@ in rustPlatform.buildRustPackage rec {
   pname = "mirrord";
 
   buildPhase = ''
-    RUSTFLAGS="-C link-arg=-L${frida-gum_hack}/lib" cargo build --release -p mirrord -Z bindeps
+    RUSTFLAGS="-L ${frida-gum}/lib" cargo build --release -p mirrord -Z bindeps
   '';
 
-  buildInputs = [ frida-gum_hack ];
-  nativeBuildInputs = with pkgs; [
-    frida-gum_hack
-    protobuf
-    frida-tools
-    pkg-config
-  ];
+  buildInputs = [ pkg-config ];
+  nativeBuildInputs = with pkgs; [ frida-gum protobuf pkg-config ];
 
-  PKG_CONFIG_PATH =
-    "${frida-gum_hack}/lib/frida-gum.h:${frida-gum_hack}/lib/libfrida-gum.a:${frida-gum_hack}/lib";
+  PKG_CONFIG_PATH = "${frida-gum}/lib";
 
   meta = with lib; {
     description =
