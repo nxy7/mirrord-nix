@@ -53,32 +53,24 @@ let
       cp $src/libfrida-gum.a $out/lib
     '';
   };
-  systemConfiguration = lib.optionals stdenv.isDarwin
-    [ pkgs.darwin.apple_sdk.frameworks.SystemConfiguration ];
-
-  mirrord-layer = rustPlatform.buildRustPackage {
-    inherit version src cargoLock doCheck;
-
-    pname = "mirrord-layer";
-
-    cargoBuildFlags = [ "-p" "mirrord-layer" ];
-
-    buildInputs = systemConfiguration ++ [ frida-gum_hack ];
-
-    nativeBuildInputs = with pkgs; [ protobuf ];
-  };
 in rustPlatform.buildRustPackage rec {
   inherit cargo version src cargoLock doCheck;
   pname = "mirrord";
-  cargoBuildFlags = [ "-p mirrord" "-Z bindeps" ];
 
-  buildInputs = [ mirrord-layer frida-gum_hack ];
-  nativeBuildInputs = with pkgs; [ protobuf frida-tools pkg-config ];
+  buildPhase = ''
+    RUSTFLAGS="-C link-arg=-L${frida-gum_hack}/lib" cargo build --release -p mirrord -Z bindeps
+  '';
 
-  MIRRORD_LAYER_FILE = if stdenv.isDarwin then
-    "${mirrord-layer}/lib/libmirrord_layer.dylib"
-  else
-    "${mirrord-layer}/lib/libmirrord_layer.so";
+  buildInputs = [ frida-gum_hack ];
+  nativeBuildInputs = with pkgs; [
+    frida-gum_hack
+    protobuf
+    frida-tools
+    pkg-config
+  ];
+
+  PKG_CONFIG_PATH =
+    "${frida-gum_hack}/lib/frida-gum.h:${frida-gum_hack}/lib/libfrida-gum.a:${frida-gum_hack}/lib";
 
   meta = with lib; {
     description =
